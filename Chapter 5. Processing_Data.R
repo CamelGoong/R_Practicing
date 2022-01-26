@@ -129,3 +129,59 @@ tail(melt_test)
 View(melt_test)
 
 melt(airquality, id.vars = c("month", "wind"), measure.vars = c("ozone"))
+
+## 긴 모양 데이터를 넓은 모양으로 바꾸기: acast(데이터, 기준열~변환열~분리기준열) dcast(데이터, 기준열~변환열)
+## melt()를 사용할 때보다 다소 복잡
+
+names(airquality) <- tolower(names(airquality)) # 소문자로 바꾸기
+head(airquality)
+
+aq_melt <- melt(airquality, id.vars = c("month", "day"), na.rm = TRUE) # dcast를 사용하기에 앞서서 melt로 변환
+head(aq_melt)
+
+aq_dcast <- dcast(aq_melt, month + day ~ variable)
+head(aq_dcast)
+
+acast(aq_melt, day~month~variable)
+
+## cast()로 데이터 요약하기
+acast(aq_melt, month~variable, mean)
+dcast(aq_melt, month~variable, sum)
+
+# 05-4 데이터 정제하기
+## 결측치 확인하기
+x <- c(1, 2, NA, 4, 5)
+
+sum(x) # 결측치를 연산하면 결측치
+is.na(x) # 각 요소의 결측치 여부 확인
+table(is.na(x)) # 결측치 빈도 확인
+
+## 결측치 제외하기
+sum(x, na.rm = TRUE) # 결측치를 제외한 값들로 sum 연산
+
+## 결측치 갯수 확인하기
+sum(is.na(x))
+
+data("airquality")
+airquality
+is.na(airquality)
+sum(is.na(airquality)) # 결측치 전체 갯수
+colSums(is.na(airquality)) # 각 컬럼당 결측치 갯수
+
+## 결측치 제거하기
+na.omit(airquality) # 결측치가 포함된 행 제거 / 중간중간에 비어진 행 확인 가능
+
+## 결측치 대체하기
+airquality[is.na(airquality)] <- 0 # 결측치들 0으로 대체
+colSums(is.na(airquality)) # 각 컬럼별 결측치 갯수
+
+## 이상치 확인하기
+data(mtcars)
+mtcars
+boxplot(mtcars$wt)
+
+boxplot(mtcars$wt)$stats # boxplot의 기술통계량 확인
+
+## 이상치 처리하기 / ifelse(조건문, 참일 때 실행, 거짓일 때 실행)
+mtcars$wt >5.25 # 최고 이상치 경계를 초과하는 이상치 확인 / boxplot을 통해서 확인했듯이, 2개 존재
+mtcars$wt <- ifelse(mtcars$wt > 5.25, NA, mtcars$wt)
