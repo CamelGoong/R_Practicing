@@ -7,6 +7,7 @@ str(car)
 attach(car)
 
 # 다중회귀분석
+# method 1 ) 전체변수를 모두 포함한 회귀모형
 r1 <- lm(mpg~disp+hp+wt+accler, data = car)
 summary(r1)
 # 결과를 보았을 때, p-value가 가장 낮은 것이 위 모형에서 가장 유의미한 변수라고 해석할 수 있음.
@@ -16,8 +17,8 @@ summary(r1)
 # 따라서, 이 데이터에 대해서 우리가 적합한 회귀모형을 만든다고 하면, hp를 50정도에서 나누어서
 # 모형을 2개로 나누어서 만들거나, 여러 방법을 고려해볼 필요성이 잇음.
 
-# 다충회귀분석 - 변수선택방법
-# 단계별 방법(stepwise)
+# 다중회귀분석 - 변수선택방법
+# method 2 ) 단계별 방법(stepwise)
 
 s1 <- step(r1, direction = "both")
 summary(s1)
@@ -33,6 +34,7 @@ summary(r2)
 # 다중공선성: 독릴변수들 사이에 상관관계가 높아서, 회귀계수가 굉장히 불안정해지는 문제점
 # 독립변수들간의 상관계수
 var2 <- c("disp", "hp", "wt", "accler")
+car[var2]
 cor(car[var2])
 # wt와 disp가 조금 높게 나타나고, 나머지 변수들은 그런 관계를 보이지 않음.
 
@@ -50,3 +52,27 @@ vif(lm(mpg~disp+hp+wt+accler, data = car)) # 회귀모형을 안에 입력
 # 그리고 한번더, 잔차의 산점도에 대한 진단을 통해서 체크해보는 것을 추천.
 layout(matrix(c(1,2,3,4), 2, 2))
 plot(r2)
+
+
+
+# 3차시: 학습데이터와 검증데이터 -------------------------------------------------------
+iris <- read.csv(file = 'iris.csv')
+head(iris)
+str(iris)
+attach(iris)
+
+# training / test data : n = 150
+set.seed(1000)
+n <- nrow(iris)
+tr.idx <- sample.int(n, size = n*2/3, replace = F)
+# check # of training set
+length(tr.idx)
+tr.idx
+
+# attributes in training and test
+iris.train <- iris[tr.idx, -5]
+iris.test <- iris[-tr.idx, -5]
+
+# 타겟 변수 형성
+trainLabels <- iris[tr.idx, 5]
+testLabels <- iris[-tr.idx, 5]
